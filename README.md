@@ -68,3 +68,21 @@
   * `DELETE /api/tarefas/{id}` — Exclui uma tarefa.
   * `PATCH /api/tarefas/{id}/concluir` — Altera o status da tarefa para `CONCLUIDA`.
 
+* **Pseudocódigo da Regra de Negócio (Cálculo Automático de Prioridade):**
+```text
+Função salvarTarefa(tarefa):
+    diasRestantes = calcularDiferencaDias(hoje(), tarefa.dataEntrega)
+    
+    Se diasRestantes <= 2 Então
+        tarefa.prioridade = "ALTA"
+    Senão Se diasRestantes <= 5 Então
+        tarefa.prioridade = "MEDIA"
+    Senão
+        tarefa.prioridade = "BAIXA"
+    FimSe
+    
+    Retornar repository.salvar(tarefa)
+FimFuncao
+```
+
+
