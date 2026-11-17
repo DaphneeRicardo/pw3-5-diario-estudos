@@ -1,0 +1,69 @@
+<div class="container">
+
+  <header>
+    <h1>Diário de Estudos</h1>
+    <p>Organize suas tarefas e acompanhe seus estudos.</p>
+  </header>
+
+  <h2>Minhas tarefas</h2>
+
+  <p *ngIf="carregando">
+    Carregando tarefas...
+  </p>
+
+  <p *ngIf="erro" class="erro">
+    {{ erro }}
+  </p>
+
+  <p *ngIf="!carregando && tarefas.length === 0">
+    Você ainda não possui tarefas cadastradas.
+  </p>
+
+  <div class="lista">
+
+    <div class="tarefa" *ngFor="let tarefa of tarefas">
+
+      <div class="informacoes">
+
+        <h3>{{ tarefa.titulo }}</h3>
+
+        <p>Matéria: {{ tarefa.materia }}</p>
+
+        <p>
+          Entrega:
+          {{ tarefa.dataEntrega | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+
+        <p>
+          Status:
+          {{ tarefa.status }}
+        </p>
+
+        <p>
+          Prioridade:
+          {{ tarefa.prioridade }}
+        </p>
+
+      </div>
+
+      <div class="acoes">
+
+        <button
+          *ngIf="tarefa.status === 'PENDENTE'"
+          (click)="concluirTarefa(tarefa.id!)">
+          Concluir
+        </button>
+
+        <button
+          class="excluir"
+          (click)="excluirTarefa(tarefa.id!)">
+          Excluir
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
