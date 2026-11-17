@@ -4,26 +4,26 @@ import br.com.daphnericardo.diario_estudos.entity.Tarefa;
 import br.com.daphnericardo.diario_estudos.enums.PrioridadeEnum;
 import br.com.daphnericardo.diario_estudos.enums.StatusEnum;
 import br.com.daphnericardo.diario_estudos.repository.TarefaRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 public class DiarioEstudosService {
-    @Autowired
-    private DiarioEstudosService diarioEstudosService;
 
     @Autowired
     private TarefaRepository tarefaRepository;
 
     public void calculoPrioridade(Tarefa tarefa) {
-        Long diasfaltando = ChronoUnit.DAYS.between(LocalDate.now(), tarefa.getDataEntrega());
+
+        Long diasfaltando = ChronoUnit.DAYS.between(
+                LocalDateTime.now(),
+                tarefa.getDataEntrega()
+        );
 
         if (diasfaltando <= 2) {
             tarefa.setPrioridade(PrioridadeEnum.ALTA);
@@ -31,7 +31,7 @@ public class DiarioEstudosService {
         else if (diasfaltando <= 5) {
             tarefa.setPrioridade(PrioridadeEnum.MEDIA);
         }
-        else{
+        else {
             tarefa.setPrioridade(PrioridadeEnum.BAIXA);
         }
     }
@@ -40,23 +40,50 @@ public class DiarioEstudosService {
         return tarefaRepository.findAll();
     }
 
-    public List<Tarefa> getTarefaById(Long id) {
-        return diarioEstudosService.getTarefaById(id);
+    public Tarefa getTarefaById(Long id) {
+        return tarefaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
     }
 
-    public List<Tarefa> saveTarefa(@RequestBody Tarefa tarefa) {
-        diarioEstudosService.calculoPrioridade(tarefa);
-        return diarioEstudosService.saveTarefa(tarefa);
+    public List<Tarefa> saveTarefa(Tarefa tarefa) {
+
+        calculoPrioridade(tarefa);
+        tarefaRepository.save(tarefa);
+
+        return tarefaRepository.findAll();
     }
 
-    public List<Tarefa> deleteTarefa(@PathVariable Long id) {
-        return diarioEstudosService.deleteTarefa(id);
+    public List<Tarefa> deleteTarefa(Long id) {
+
+        tarefaRepository.deleteById(id);
+
+        return tarefaRepository.findAll();
     }
-    public List<Tarefa> updateTarefa(@RequestBody Tarefa tarefa) {
-        return diarioEstudosService.updateTarefa(tarefa);
+
+    public List<Tarefa> updateTarefa(Long id, Tarefa tarefa) {
+
+        Tarefa tarefaExistente = getTarefaById(id);
+
+        tarefaExistente.setTitulo(tarefa.getTitulo());
+        tarefaExistente.setMateria(tarefa.getMateria());
+        tarefaExistente.setDataEntrega(tarefa.getDataEntrega());
+        tarefaExistente.setStatus(tarefa.getStatus());
+
+        calculoPrioridade(tarefaExistente);
+
+        tarefaRepository.save(tarefaExistente);
+
+        return tarefaRepository.findAll();
     }
-    public List<Tarefa> concluirTarefa(@RequestBody Tarefa tarefa) {
+
+    public List<Tarefa> concluirTarefa(Long id) {
+
+        Tarefa tarefa = getTarefaById(id);
+
         tarefa.setStatus(StatusEnum.CONCLUIDO);
-        return diarioEstudosService.concluirTarefa(tarefa);
+
+        tarefaRepository.save(tarefa);
+
+        return tarefaRepository.findAll();
     }
 }

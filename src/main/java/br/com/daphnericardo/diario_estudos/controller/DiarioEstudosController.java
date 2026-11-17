@@ -30,13 +30,19 @@ public class DiarioEstudosController {
     }
 
     @PutMapping("/tarefas/{id}")
-    public List<Tarefa> updateTarefa(@PathVariable Long id, @RequestBody Tarefa tarefa) {
-        return  diarioEstudosService.updateTarefa(tarefa);
+    public List<Tarefa> updateTarefa(
+            @PathVariable Long id,
+            @RequestBody Tarefa tarefa
+    ) {
+        return diarioEstudosService.updateTarefa(id, tarefa);
+    }
+
+    @PatchMapping("/tarefas/{id}/concluir")
+    public List<Tarefa> concluirTarefa(@PathVariable Long id) {
+        return diarioEstudosService.concluirTarefa(id);
     }
 
     @DeleteMapping("/tarefas/{id}")
     public List<Tarefa> deleteTarefa(@PathVariable Long id){return diarioEstudosService.deleteTarefa(id);}
 
-    @PatchMapping("/tarefas/{id}/concluir")
-    public  List<Tarefa> concluirTarefa(@RequestBody Tarefa tarefa){return diarioEstudosService.concluirTarefa(tarefa);}
 }
